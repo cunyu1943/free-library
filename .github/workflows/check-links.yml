@@ -1,0 +1,31 @@
+name: 检测资源链接状态
+
+on:
+  schedule:
+    # 每隔 1 小时执行一次
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: 检测并更新链接状态
+        run: python .github/scripts/check_links.py
+
+      - name: 提交更新
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: 更新资源链接检测状态"
+          file_pattern: "docs/src/guide.md"
