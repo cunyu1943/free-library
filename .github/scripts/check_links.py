@@ -25,35 +25,49 @@ def extract_url(cell: str) -> str | None:
 
 
 def is_accessible(url: str) -> bool:
-    """尝试访问 URL，判断是否可以访问。"""
+    """尝试访问 URL，判断是否可以访问。
+
+    判定原则：只要服务器给予了 HTTP 响应（含 2xx/3xx/4xx/5xx）即视为“可访问”，
+    因为 4xx/5xx 也说明站点在线、服务正常响应；
+    只有网络层错误（DNS 失败、连接超时/拒绝、证书错误等）才视为“不可访问”。
+    """
     headers = {
         "User-Agent": (
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
             "AppleWebKit/537.36 (KHTML, like Gecko) "
             "Chrome/120.0.0.0 Safari/537.36"
-        )
+        ),
+        "Accept": (
+            "text/html,application/xhtml+xml,application/xml;q=0.9,"
+            "image/avif,image/webp,*/*;q=0.8"
+        ),
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
     }
+    # 跟随重定向，最多 5 次
+    opener = urllib.request.build_opener(
+        urllib.request.HTTPRedirectHandler()
+    )
     for attempt in range(2):
         try:
-            req = urllib.request.Request(url, headers=headers, method="HEAD")
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                if 200 <= resp.status < 400:
-                    return True
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, OSError):
-            pass
-        # HEAD 失败时退化为 GET
-        try:
             req = urllib.request.Request(url, headers=headers, method="GET")
-            with urllib.request.urlopen(req, timeout=15) as resp:
-                if 200 <= resp.status < 400:
-                    return True
-        except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, OSError):
-            pass
+            with opener.open(req, timeout=20) as resp:
+                # 读到响应即视为可访问（不限制具体状态码）
+                resp.read(1024)
+                return True
+        except urllib.error.HTTPError as e:
+            # 服务器返回了 HTTP 错误状态码，说明站点在线
+            if e.code is not None:
+                return True
+        except (urllib.error.URLError, TimeoutError, OSError):
+            # 网络层错误：DNS 失败、连接超时/拒绝、证书错误等
+            continue
     return False
 
 
 def main() -> None:
-    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # 北京时间（UTC+8）
+    bj_tz = datetime.timezone(datetime.timedelta(hours=8))
+    now = datetime.datetime.now(bj_tz).strftime("%Y-%m-%d %H:%M:%S")
 
     with open(MD_PATH, encoding="utf-8") as f:
         lines = f.readlines()
