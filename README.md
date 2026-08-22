@@ -1,154 +1,99 @@
-# VitePress 个人站点模板
+# 📚 Free Library · 免费电子书下载站点推荐
 
-基于 [VitePress](https://vitepress.dev/) 构建的个人站点模板，集成了丰富的社区插件与自定义主题样式，开箱即用。
+一个专注于收集和推荐**免费电子书下载网站**的开源项目。本项目整理了 Z-Library、Anna's Archive 等主流免费电子书镜像站点的可用链接，并通过自动化手段持续检测各站点可达性，帮助你快速找到当前可访问的免费电子书资源。
 
-## 功能特性
+> 站点链接随时可能失效或变更，本项目会**每小时自动检测**一次，并在页面上以 ✅ / ❌ 实时标记可用性，让你少走弯路。
 
-- **全文搜索** — 基于 [pagefind](https://pagefind.app/) 的离线全文搜索
-- **RSS 订阅** — 通过 `vitepress-plugin-rss` 自动生成 RSS
-- **Git 变更日志** — 基于 `@nolebase/vitepress-plugin-git-changelog` 自动记录页面修改历史
-- **公告弹窗** — 自定义公告组件，支持文本、图片、按钮，5 秒自动关闭
-- **打赏功能** — 集成 `vitepress-plugin-sponsor`，支持支付宝/微信二维码
-- **站点统计** — 基于 [不蒜子](https://busuanzi.pure.js.org/) 的访问量与访客数统计
-- **文章元信息** — 自动显示更新日期、字数统计、预估阅读时长
-- **代码组图标** — `vitepress-plugin-group-icons` 为代码块添加语言图标
-- **自定义样式** — 引用块、代码块、侧边栏图标、模糊隐藏、标记高亮等多套自定义样式
-- **霞鹜文楷字体** — 全站使用 LXGW WenKai GB Screen R 字体
-- **Hero 下划线动画** — 首页标题带 SVG 下划线装饰
-- **暗色主题** — 默认启用深色模式
-- **GitHub Pages 自动部署** — 配置了 GitHub Actions 工作流，推送到 `main` 分支自动构建部署
+## ✨ 项目特色
 
-## 项目结构
+- **精选免费电子书站点** — 持续收录 Z-Library、Anna's Archive 等优质免费电子书下载镜像站
+- **链接可用性实时检测** — 通过 GitHub Actions 每小时自动检测资源链接，可用标记 ✅，不可用标记 ❌
+- **北京时间检测时间戳** — 每条链接均记录最近一次检测时间（格式 `yyyy-MM-dd HH:mm:ss`，北京时间），方便判断时效性
+- **自动同步部署** — 检测结果更新后自动重新构建并部署到 GitHub Pages，页面内容始终与最新检测状态一致
+- **美观的文档站点** — 基于 VitePress 构建，支持全文搜索、暗色主题、阅读时长统计等良好阅读体验
+
+## 🔗 资源列表
+
+所有免费电子书站点链接收录在 [docs/src/guide.md](docs/src/guide.md)，表格包含：
+
+| 列 | 说明 |
+|----|------|
+| 资源 | 站点名称 + 跳转链接 |
+| 状态 | ✅ 可访问 / ❌ 不可访问（每小时自动更新） |
+| 简介 | 站点类型说明（如 Z-library 镜像站、安娜的档案镜像站） |
+| 检测时间 | 最近一次检测时间（北京时间） |
+
+## 🚀 快速开始
+
+### 在线访问
+
+直接访问部署在 GitHub Pages 上的站点即可查看最新可用的免费电子书下载链接。
+
+### 本地预览
+
+```bash
+# 环境要求：Node.js >= 20，pnpm
+pnpm install
+pnpm docs:dev      # 本地开发预览
+pnpm docs:build    # 构建生产版本
+pnpm docs:preview  # 预览构建结果
+```
+
+## 🤖 自动化说明
+
+项目通过 GitHub Actions 实现链接检测的自动化：
+
+- **定时检测 + 部署**（[.github/workflows/auto-deploy.yml](.github/workflows/auto-deploy.yml)）
+  - 每小时整点自动运行；
+  - 先执行 [.github/scripts/check_links.py](.github/scripts/check_links.py) 检测 `guide.md` 中各站点链接可用性，更新状态与检测时间；
+  - 随后自动构建并部署到 GitHub Pages，保证线上页面与最新检测结果一致；
+  - 推送到 `main` 分支时同样会触发构建部署。
+- **手动检测**（[.github/workflows/check-links.yml](.github/workflows/check-links.yml)）
+  - 支持在 Actions 标签页手动触发，单独更新链接检测状态。
+
+### 检测逻辑
+
+`check_links.py` 采用浏览器请求头 + 跟随重定向的方式访问站点，只要服务器返回 HTTP 响应（含 4xx/5xx）即视为「可访问」（说明站点在线），仅在网络层错误（DNS 失败、连接超时/拒绝、证书错误等）时才标记为「不可访问」。
+
+## 📁 项目结构
 
 ```
-.
+free-library/
 ├── .github/
+│   ├── scripts/
+│   │   └── check_links.py       # 资源链接检测脚本
 │   └── workflows/
-│       └── auto-deploy.yml       # GitHub Actions 自动部署
+│       ├── auto-deploy.yml       # 自动检测 + 部署工作流
+│       └── check-links.yml       # 链接检测（手动触发）
 ├── docs/
-│   ├── .vitepress/
-│   │   ├── configs/
-│   │   │   ├── nav.ts            # 导航栏配置
-│   │   │   └── sidebar.ts        # 侧边栏配置
-│   │   ├── theme/
-│   │   │   ├── components/
-│   │   │   │   ├── ArticleMetadata.vue  # 文章元信息（字数/阅读时长）
-│   │   │   │   ├── DataPanel.vue        # 站点访问量统计面板
-│   │   │   │   ├── HomeUnderline.vue    # 首页标题下划线装饰
-│   │   │   │   └── notice.vue           # 公告弹窗组件
-│   │   │   ├── style/
-│   │   │   │   ├── var.css              # CSS 变量与字体
-│   │   │   │   ├── index.css            # 样式入口
-│   │   │   │   ├── blockquote.css       # 引用块样式
-│   │   │   │   ├── blur.css             # 模糊隐藏样式
-│   │   │   │   ├── hidden.css           # 隐藏样式
-│   │   │   │   ├── marker.css           # 标记高亮样式
-│   │   │   │   ├── sidebarIcon.css      # 侧边栏图标样式
-│   │   │   │   ├── vp-code.css          # 代码块样式
-│   │   │   │   ├── vp-code-group.css    # 代码组样式
-│   │   │   │   └── vp-code-title.css    # 代码标题样式
-│   │   │   ├── untils/
-│   │   │   │   └── functions.ts         # 工具函数（字数统计）
-│   │   │   └── index.ts                 # 主题入口
-│   │   └── config.mts                   # VitePress 站点配置
+│   ├── .vitepress/               # VitePress 配置与主题
 │   └── src/
-│       ├── public/
-│       │   ├── imgs/                    # 图片资源
-│       │   └── svg/                     # SVG 图标
-│       ├── index.md                     # 首页
-│       ├── api-examples.md             # API 示例页
-│       └── markdown-examples.md        # Markdown 扩展示例页
+│       ├── guide.md              # 免费电子书站点资源列表
+│       └── ...                   # 其他文档页
 ├── package.json
 ├── pnpm-lock.yaml
-└── LICENSE                             # CC BY 4.0
+└── LICENSE
 ```
 
-## 快速开始
-
-### 环境要求
-
-- Node.js >= 20
-- pnpm（推荐）
-
-### 安装依赖
-
-```bash
-pnpm install
-```
-
-### 本地开发
-
-```bash
-pnpm docs:dev
-```
-
-### 构建生产
-
-```bash
-pnpm docs:build
-```
-
-### 预览构建结果
-
-```bash
-pnpm docs:preview
-```
-
-## 自定义配置
-
-### 站点信息
-
-编辑 [docs/.vitepress/config.mts](docs/.vitepress/config.mts) 修改站点标题、描述、语言等基础配置：
-
-```ts
-export default defineConfig({
-  title: "你的站点名",
-  description: "你的站点描述",
-  lang: 'zh-CN',
-  // ...
-})
-```
-
-### 导航栏与侧边栏
-
-- 导航栏：编辑 [docs/.vitepress/configs/nav.ts](docs/.vitepress/configs/nav.ts)
-- 侧边栏：编辑 [docs/.vitepress/configs/sidebar.ts](docs/.vitepress/configs/sidebar.ts)
-
-### 公告弹窗
-
-编辑 [docs/.vitepress/theme/components/notice.vue](docs/.vitepress/theme/components/notice.vue) 修改公告内容，或在 [config.mts](docs/.vitepress/config.mts) 中通过 `AnnouncementPlugin` 配置。
-
-### 打赏二维码
-
-替换以下图片文件：
-
-- `docs/src/public/imgs/award/alipay.jpg` — 支付宝收款码
-- `docs/src/public/imgs/award/wechatpay.jpg` — 微信收款码
-
-### 主题色与字体
-
-编辑 [docs/.vitepress/theme/style/var.css](docs/.vitepress/theme/style/var.css) 修改 CSS 变量，包括品牌色、Hero 渐变色、字体等。
-
-## 部署
-
-项目已配置 GitHub Actions 自动部署工作流（[.github/workflows/auto-deploy.yml](.github/workflows/auto-deploy.yml)），推送到 `main` 分支即可自动构建并部署到 GitHub Pages。
-
-如需手动部署，请参考 [VitePress 部署文档](https://vitepress.dev/guide/deploy)。
-
-## 技术栈
+## 🛠 技术栈
 
 | 技术 | 说明 |
 |------|------|
 | [VitePress](https://vitepress.dev/) | 静态站点生成器 |
 | [Vue 3](https://vuejs.org/) | 前端框架 |
 | [pagefind](https://pagefind.app/) | 离线全文搜索 |
-| [不蒜子](https://busuanzi.pure.js.org/) | 站点访问统计 |
-| [LXGW WenKai](https://github.com/lxgw/LxgwWenKai) | 霞鹜文楷字体 |
+| Python + urllib | 资源链接可用性检测脚本 |
+| GitHub Actions | 定时检测与自动部署 |
 
-## Star 趋势
+## 🤝 贡献
 
-[![Star History Chart](https://api.star-history.com/svg?repos=cunyu1943/vitpress&type=Date)](https://star-history.com/#cunyu1943/vitpress&Date)
+欢迎补充更多优质、合法的免费电子书下载站点！你可以：
 
-## 许可证
+1. 在 [docs/src/guide.md](docs/src/guide.md) 中按表格格式新增站点链接；
+2. 提交 Pull Request，CI 会自动检测链接可用性并更新状态。
+
+> ⚠️ 请仅收录合法、合规的免费电子书资源站点。本项目不对站点的内容合法性负责，使用相关资源请遵守当地法律法规。
+
+## 📄 许可证
 
 [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE)

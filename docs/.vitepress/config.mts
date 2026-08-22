@@ -98,9 +98,9 @@ export default defineConfig({
   },
 
   // 站点名
-  title: "村雨遥",
+  title: "村雨遥の免费图书馆",
   // 站点描述
-  description: "A VitePress Site",
+  description: "电子书免费下载网站推荐，每小时自动检查网站是否可用。",
   // 纯净链接
   cleanUrls: true,
   // 预演

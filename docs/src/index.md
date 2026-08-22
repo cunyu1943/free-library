@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "村雨遥"
   text: "Free Library"
-  tagline: 电子书免费下载网站，每日凌晨自动检查更新网站是否可用
+  tagline: 电子书免费下载网站推荐，每小时自动检查网站是否可用。
   image:
     src: imgs/site/logo.png
   actions:
