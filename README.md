@@ -66,10 +66,13 @@ free-library/
 │       ├── auto-deploy.yml       # 自动检测 + 部署工作流
 │       └── check-links.yml       # 链接检测（手动触发）
 ├── docs/
-│   ├── .vitepress/               # VitePress 配置与主题
+│   ├── .vitepress/
+│   │   ├── config.mts            # VitePress 站点配置
+│   │   └── configs/              # 导航 / 侧边栏等配置
 │   └── src/
+│       ├── index.md              # 首页
 │       ├── guide.md              # 免费电子书站点资源列表
-│       └── ...                   # 其他文档页
+│       └── public/               # 静态资源（logo、二维码、图片等）
 ├── package.json
 ├── pnpm-lock.yaml
 └── LICENSE
