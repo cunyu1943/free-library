@@ -18,7 +18,7 @@ hero:
 
 features:
   - title: 精选免费电子书站点
-    details: 持续收录 Z-Library、Anna's Archive、Libgen 等优质免费电子书下载镜像站与文档搜索引擎，目前已整理 17 个可用资源。
+    details: 收录 Z-Library、Anna's Archive 等资源站，以及 Project Gutenberg、书格、中文维基文库等公版书与开放授权数字图书馆，目前已整理 30 个资源链接。
     link: /guide
     linkText: 查看全部资源
   - title: 链接可用性实时检测
